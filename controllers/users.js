@@ -5,7 +5,7 @@ const { ERROR_INVALID } = require('../utils/constants');
 
 const getUsers = (res, next) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -23,8 +23,7 @@ const createUser = (req, res, next) => {
 };
 
 const getUserById = (req, res, next) => {
-  const { _id } = req.params;
-  User.findById(_id)
+  User.findById(req.params._id)
     .onFail(new Error('NotFound'))
     .then((user) => {
       res.send({ data: user });
