@@ -13,11 +13,11 @@ const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      res.send({ data: user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === ERROR_INVALID) {
-        next(new InvalidError(err.message));
+        next(InvalidError(err.message));
       } else next(err);
     });
 };
