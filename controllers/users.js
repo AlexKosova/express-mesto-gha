@@ -3,7 +3,7 @@ const InvalidError = require('../errors/InvalidError');
 const NotFoundError = require('../errors/NotFoundError');
 const { ERROR_INVALID } = require('../utils/constants');
 
-const getUsers = (req, res, next) => {
+const getUsers = (res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(next);
