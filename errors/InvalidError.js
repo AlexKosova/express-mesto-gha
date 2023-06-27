@@ -7,4 +7,4 @@ class InvalidError extends Error {
   }
 }
 
-module.exports = { InvalidError };
+module.exports = InvalidError;

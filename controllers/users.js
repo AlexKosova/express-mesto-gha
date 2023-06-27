@@ -3,7 +3,7 @@ const InvalidError = require('../errors/InvalidError');
 const NotFoundError = require('../errors/NotFoundError');
 const { ERROR_INVALID } = require('../utils/constants');
 
-const getUsers = (res, next) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch(next);
@@ -16,8 +16,8 @@ const createUser = (req, res, next) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === ERROR_INVALID) {
-        next(InvalidError(err.message));
+      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
+        next(new InvalidError(err.message));
       } else next(err);
     });
 };
