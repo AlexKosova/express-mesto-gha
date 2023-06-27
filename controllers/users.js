@@ -1,19 +1,17 @@
-import {
-  find, create, findById, findByIdAndUpdate,
-} from '../models/user';
-import InvalidError from '../errors/InvalidError';
-import NotFoundError from '../errors/NotFoundError';
-import { ERROR_INVALID } from '../utils/constants';
+const User = require('../models/user');
+const InvalidError = require('../errors/InvalidError');
+const NotFoundError = require('../errors/NotFoundError');
+const { ERROR_INVALID } = require('../utils/constants');
 
 const getUsers = (req, res, next) => {
-  find({})
+  User.find({})
     .then((users) => res.send({ data: users }))
     .catch(next);
 };
 
 const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
-  create({ name, about, avatar })
+  User.create({ name, about, avatar })
     .then((user) => {
       res.send({ data: user });
     })
@@ -26,7 +24,7 @@ const createUser = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   const { _id } = req.params;
-  findById(_id)
+  User.findById(_id)
     .onFail(new Error('NotFound'))
     .then((user) => {
       res.send({ data: user });
@@ -45,7 +43,7 @@ const updateProfile = (req, res, next) => {
     name: req.body.name,
     about: req.body.about,
   };
-  findByIdAndUpdate(req.user._id, data, { new: true })
+  User.findByIdAndUpdate(req.user._id, data, { new: true })
     .onFail(new Error('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
@@ -61,7 +59,7 @@ const updateAvatar = (req, res, next) => {
   const data = {
     avatar: req.body.avatar,
   };
-  findByIdAndUpdate(req.user._id, data)
+  User.findByIdAndUpdate(req.user._id, data)
     .onFail(new Error('NotFound'))
     .then((user) => res.send(user))
     .catch((err) => {
@@ -73,7 +71,7 @@ const updateAvatar = (req, res, next) => {
     });
 };
 
-export default {
+module.exports = {
   getUsers,
   createUser,
   getUserById,

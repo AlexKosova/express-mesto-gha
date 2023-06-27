@@ -1,4 +1,4 @@
-import { ERROR_INVALID } from '../utils/constants';
+const { ERROR_INVALID } = require('../utils/constants');
 
 class InvalidError extends Error {
   constructor(message) {
@@ -7,4 +7,4 @@ class InvalidError extends Error {
   }
 }
 
-export default { InvalidError };
+module.exports = { InvalidError };
