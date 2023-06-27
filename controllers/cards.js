@@ -32,7 +32,7 @@ const deleteCard = (req, res, next) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        new NotFoundError(err.message);
+        NotFoundError(err.message);
       } else {
         next(err);
       }
@@ -62,7 +62,7 @@ const deleteLike = (req, res, next) => {
     .then((cards) => res.send(cards))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        new NotFoundError(err.message);
+        NotFoundError(err.message);
       } else {
         next(err);
       }
@@ -70,5 +70,5 @@ const deleteLike = (req, res, next) => {
 };
 
 module.exports = {
-  createCard, getCards, deleteCard, putLike, deleteLike
+  createCard, getCards, deleteCard, putLike, deleteLike,
 };

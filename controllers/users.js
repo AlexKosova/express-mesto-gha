@@ -31,7 +31,7 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        new NotFoundError(err.message);
+        NotFoundError(err.message);
       } else {
         next(err);
       }
@@ -48,7 +48,7 @@ const updateProfile = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        new NotFoundError(err.message);
+        NotFoundError(err.message);
       } else {
         next(err);
       }
@@ -64,7 +64,7 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        new NotFoundError(err.message);
+        NotFoundError(err.message);
       } else {
         next(err);
       }
