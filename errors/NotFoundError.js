@@ -1,10 +1,10 @@
-const { ERROR_NOT_FOUND } = require('../utils/constants');
+import { ERROR_NOT_FOUND } from '../utils/constants';
 
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
-    this.statusCode = ERROR_NOT_FOUND
+    this.statusCode = ERROR_NOT_FOUND;
   }
 }
 
-module.exports = { NotFoundError }
+export default { NotFoundError };
