@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
-const cardRouter = require('./routes/cards')
+const cardRouter = require('./routes/cards');
 const errorMiddlware = require('./middlewares/errors');
+const routes = require('./routes/routes');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
+app.use(routes);
 app.use((req, res, next) => {
   req.user = {
     _id: '649b58714042af9b50f73492',
