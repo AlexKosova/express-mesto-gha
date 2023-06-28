@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// eslint-disable-next-line function-paren-newline
 const cardSchema = new mongoose.Schema({
   name: {
     minlength: 2,
@@ -12,19 +13,21 @@ const cardSchema = new mongoose.Schema({
     type: String,
   },
   owner: {
-    ref: 'user',
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     default: [],
-    ref: 'user',
   }],
   createdAr: {
     type: Date,
     default: Date.now,
   },
-});
+},
+{
+  toJSON: { useProjection: true },
+},
+);
 
 module.exports = mongoose.model('card', cardSchema);

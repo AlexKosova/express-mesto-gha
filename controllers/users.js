@@ -37,14 +37,14 @@ const getUserById = (req, res, next) => {
 };
 
 const updateProfile = (req, res, next) => {
-  const { _id } = req.params;
+  const { _id } = req.user;
   const data = {
     name: req.body.name,
     about: req.body.about,
   };
   User.findByIdAndUpdate(_id, data, { new: true, runValidators: true })
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
@@ -56,15 +56,13 @@ const updateProfile = (req, res, next) => {
 };
 
 const updateAvatar = (req, res, next) => {
-  const { _id } = req.params;
-  const data = {
-    avatar: req.body.avatar,
-  };
-  User.findByIdAndUpdate(_id, data, { new: true, runValidators: true })
-    .then((user) => res.send(user))
+  const { _id } = req.user;
+  const data = { avatar: req.body.avatar };
+  User.findByIdAndUpdate(_id, data, { runValidators: true, new: true })
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        NotFoundError(err.message);
+      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
+        next(new InvalidError(err.message));
       } else {
         next(err);
       }

@@ -1,19 +1,20 @@
+const mongoose = require('mongoose');
 const Card = require('../models/card');
-const InvalidError = require('../errors/InvalidError').default;
-const NotFoundError = require('../errors/NotFoundError').default;
-const { ERROR_INVALID } = require('../utils/constants');
+const InvalidError = require('../errors/InvalidError');
+const NotFoundError = require('../errors/NotFoundError');
+const { ERROR_INVALID, ERROR_NOT_FOUND } = require('../utils/constants');
+const card = require('../models/card');
 
 const createCard = (req, res, next) => {
-  const data = {
+  const newCard = {
     name: req.body.name,
     link: req.body.link,
     owner: req.user._id,
-  };
-  // console.log(req.user._id);
-  Card.create(data)
-    .then((card) => res.send(card))
+  }
+  Card.create(newCard)
+    .then((card) => res.status(200).send({data: card}))
     .catch((err) => {
-      if (err.name === ERROR_INVALID) {
+      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
         next(new InvalidError(err.message));
       } else next(err);
     });
@@ -26,46 +27,52 @@ const getCards = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
+  const cardId = req.params.cardId;
+  if (!mongoose.isValidObjectId(cardId)) {
+    throw new InvalidError(ERROR_INVALID);
+  }
   Card.findByIdAndRemove(cardId)
-    .onFail(new Error('NotFound'))
-    .then((cards) => res.send(cards))
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        NotFoundError(err.message);
-      } else {
-        next(err);
-      }
-    });
+    .then((card) => {
+      if (!card) { throw new NotFoundError(ERROR_NOT_FOUND); }
+      res.status(200).send(card)})
+    .catch(next)
 };
 
 const putLike = (req, res, next) => {
-  const { cardId } = req.params;
+  const cardId = req.params.cardId;
+  if (!mongoose.isValidObjectId(cardId)) {
+    throw new InvalidError(ERROR_INVALID);
+  }
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true},
   )
-    .onFail(new Error('NotFound'))
-    .then((cards) => res.send(cards))
-    .catch(next);
+  .then((card) => {
+    if (!card) {throw new NotFoundError(ERROR_NOT_FOUND); }
+    res.status(200).send({data: card})}
+  )
+  .catch((err) => {
+    next(err);
+  });
 };
 
 const deleteLike = (req, res, next) => {
-  const { cardId } = req.params;
+  const cardId = req.params.cardId;
+  if (!mongoose.isValidObjectId(cardId)) {
+    throw new InvalidError(ERROR_INVALID);
+  }
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .onFail(new Error('NotFound'))
-    .then((cards) => res.send(cards))
+    .then((card) => {
+      if (!card) {throw new NotFoundError(ERROR_NOT_FOUND);}
+      res.status(200).send({data: card})}
+    )
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        NotFoundError(err.message);
-      } else {
-        next(err);
-      }
+      next(err);
     });
 };
 
