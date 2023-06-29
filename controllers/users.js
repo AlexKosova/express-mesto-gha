@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/user');
 const InvalidError = require('../errors/InvalidError');
 const NotFoundError = require('../errors/NotFoundError');
-const { ERROR_INVALID, ERROR_NOT_FOUND } = require('../utils/constants');
+const { ERROR_INVALID } = require('../utils/constants');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -13,10 +13,10 @@ const getUsers = (req, res, next) => {
 const createUser = (req, res, next) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError(err.message));
+        next(new InvalidError('Введены некорректные данные'));
       } else next(err);
     });
 };
@@ -24,12 +24,12 @@ const createUser = (req, res, next) => {
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
   if (!mongoose.isValidObjectId(userId)) {
-    throw new InvalidError(ERROR_INVALID);
+    throw new InvalidError('Некорректный id пользователя');
   }
   User.findById(userId)
     .then((user) => {
-      if (!user) { throw new NotFoundError(ERROR_NOT_FOUND); }
-      res.status(200).send({ data: user });
+      if (!user) { throw new NotFoundError('Пользователь не найден'); }
+      res.send({ data: user });
     })
     .catch((err) => {
       next(err);
@@ -44,11 +44,11 @@ const updateProfile = (req, res, next) => {
   };
   User.findByIdAndUpdate(_id, data, { new: true, runValidators: true })
     .then((user) => {
-      res.status(200).send({ data: user });
+      res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError(err.message));
+        next(new InvalidError('Введены некорректные данные'));
       } else {
         next(err);
       }
@@ -59,10 +59,10 @@ const updateAvatar = (req, res, next) => {
   const { _id } = req.user;
   const data = { avatar: req.body.avatar };
   User.findByIdAndUpdate(_id, data, { runValidators: true, new: true })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError(err.message));
+        next(new InvalidError('Неверная ссылка'));
       } else {
         next(err);
       }

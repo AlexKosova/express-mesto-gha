@@ -11,10 +11,10 @@ const createCard = (req, res, next) => {
     owner: req.user._id,
   };
   Card.create(newCard)
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError(err.message));
+        next(new InvalidError('Введены неверные данные'));
       } else next(err);
     });
 };
@@ -28,14 +28,14 @@ const getCards = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   if (!mongoose.isValidObjectId(cardId)) {
-    throw new InvalidError(ERROR_INVALID);
+    throw new InvalidError('Некорректный id');
   }
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(ERROR_NOT_FOUND);
+        throw new NotFoundError('Данные не найдены');
       }
-      res.status(200).send(card);
+      res.send(card);
     })
     .catch(next);
 };
@@ -43,7 +43,7 @@ const deleteCard = (req, res, next) => {
 const putLike = (req, res, next) => {
   const { cardId } = req.params;
   if (!mongoose.isValidObjectId(cardId)) {
-    throw new InvalidError(ERROR_INVALID);
+    throw new InvalidError('Некорректный id');
   }
   Card.findByIdAndUpdate(
     cardId,
@@ -52,19 +52,17 @@ const putLike = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(ERROR_NOT_FOUND);
+        throw new NotFoundError('Данные не найдены');
       }
-      res.status(200).send({ data: card });
+      res.send({ data: card });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const deleteLike = (req, res, next) => {
   const { cardId } = req.params;
   if (!mongoose.isValidObjectId(cardId)) {
-    throw new InvalidError(ERROR_INVALID);
+    throw new InvalidError('Некорректный id');
   }
   Card.findByIdAndUpdate(
     cardId,
@@ -73,13 +71,11 @@ const deleteLike = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(ERROR_NOT_FOUND);
+        throw new NotFoundError('Данные не найдены');
       }
-      res.status(200).send({ data: card });
+      res.send({ data: card });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports = {
