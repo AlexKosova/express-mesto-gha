@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Card = require('../models/card');
 const InvalidError = require('../errors/InvalidError');
 const NotFoundError = require('../errors/NotFoundError');
-const { ERROR_INVALID, ERROR_NOT_FOUND } = require('../utils/constants');
+const { ERROR_INVALID } = require('../utils/constants');
 
 const createCard = (req, res, next) => {
   const newCard = {
