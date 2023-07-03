@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
-const InvalidError = require('../errors/InvalidError');
+const InvalidError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const { ERROR_INVALID } = require('../utils/constants');
 
@@ -27,6 +27,7 @@ const getCards = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
+  const { _id } = req.user;
   if (!mongoose.isValidObjectId(cardId)) {
     throw new InvalidError('Некорректный id');
   }
@@ -35,7 +36,9 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Данные не найдены');
       }
-      res.send(card);
+      if (_id === card.owner.id) {
+        res.send(card);
+      } else { next('У вас нет прав для удаления этой карточки'); }
     })
     .catch(next);
 };

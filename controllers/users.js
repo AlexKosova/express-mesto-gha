@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const InvalidError = require('../errors/InvalidError');
+const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
+const InvalidError = require('../errors/InvalidError');
 const { ERROR_INVALID } = require('../utils/constants');
 
 const getUsers = (req, res, next) => {
@@ -11,13 +14,47 @@ const getUsers = (req, res, next) => {
 };
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10).then((hash) => User.create({
+    name,
+    about,
+    avatar,
+    email,
+    password: hash,
+  })
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
         next(new InvalidError('Введены некорректные данные'));
+      }
+      if (err.code === 11000) {
+        next(new InvalidError('Пользователь уже существует'));
       } else next(err);
+    }));
+};
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .select('+password')
+    .then((user) => {
+      if (!user) throw new AuthError('Неверно введена почта или пароль');
+      bcrypt.compare(password, user.password).then((isValid) => {
+        if (!isValid) {
+          throw new InvalidError('Неверно введена почта или пароль');
+        }
+        const token = jwt.sign({ _id: user._id }, 'secretKey', {
+          expiresIn: '7d',
+        });
+        res
+          .cookie('jwt', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+          })
+          .send({ token });
+      });
     });
 };
 
@@ -28,9 +65,20 @@ const getUserById = (req, res, next) => {
   }
   User.findById(userId)
     .then((user) => {
-      if (!user) { throw new NotFoundError('Пользователь не найден'); }
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
       res.send({ data: user });
     })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+const getUser = (req, res, next) => {
+  const { _id } = req.user;
+  User.findById(_id)
+    .then((user) => res.send(user))
     .catch((err) => {
       next(err);
     });
@@ -75,4 +123,6 @@ module.exports = {
   getUserById,
   updateProfile,
   updateAvatar,
+  login,
+  getUser,
 };
