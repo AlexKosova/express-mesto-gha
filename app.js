@@ -8,16 +8,7 @@ const routes = require('./routes/routes');
 const { PORT = 3000 } = process.env;
 const app = express();
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '649b58714042af9b50f73492',
-//   };
-
-//   next();
-// });
 app.use(express.json());
-app.use(userRouter);
-app.use(cardRouter);
 app.use(routes);
 app.use(errorMiddlware);
 
