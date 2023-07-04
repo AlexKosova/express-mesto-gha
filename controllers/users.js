@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+const RegisterError = require('../errors/RegisterError');
 const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const InvalidError = require('../errors/InvalidError');
@@ -26,12 +27,12 @@ const createUser = (req, res, next) => {
   })
     .then((user) => res.send(user))
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new RegisterError('Пользователь уже существует'));
+      } else next(err);
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
         next(new InvalidError('Введены некорректные данные'));
       }
-      if (err.code === 11000) {
-        next(new InvalidError('Пользователь уже существует'));
-      } else next(err);
     }));
 };
 
