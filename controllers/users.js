@@ -55,10 +55,15 @@ const login = (req, res) => {
         res.cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
-        })
-          .send({ token });
+        }).send({ token });
+      }).catch((err) => {
+        if (err instanceof AuthError) {
+          next(new AuthError('Некорректные почта или пароль'));
+        } else {
+          next(err);
+        }
       });
-    }).catch(next);
+    });
 };
 
 const getUserById = (req, res, next) => {
