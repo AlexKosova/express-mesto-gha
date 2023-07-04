@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
@@ -57,7 +58,7 @@ const login = (req, res) => {
         })
           .send({ token });
       });
-    });
+    }).catch(next);
 };
 
 const getUserById = (req, res, next) => {
