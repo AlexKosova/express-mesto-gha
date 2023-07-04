@@ -37,7 +37,7 @@ const createUser = (req, res, next) => {
     }));
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .select('+password')
@@ -56,13 +56,13 @@ const login = (req, res) => {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
         }).send({ token });
-      }).catch((err) => {
-        if (err instanceof AuthError) {
-          next(new AuthError('Некорректные почта или пароль'));
-        } else {
-          next(err);
-        }
       });
+    }).catch((err) => {
+      if (err instanceof AuthError) {
+        next(new AuthError('Некорректные почта или пароль'));
+      } else {
+        next(err);
+      }
     });
 };
 
