@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const errorMiddlware = require('./middlewares/errors');
 const routes = require('./routes/routes');
+const {errors} = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -15,6 +16,7 @@ const app = express();
 // });
 app.use(express.json());
 app.use(routes);
+app.use(errors())
 app.use(errorMiddlware);
 
 async function connect() {
