@@ -41,7 +41,9 @@ const login = (req, res) => {
   User.findOne({ email })
     .select('+password')
     .then((user) => {
-      if (!user) throw new AuthError('Неверно введена почта или пароль');
+      if (!user) {
+        throw new AuthError('Неверно введена почта или пароль');
+      }
       bcrypt.compare(password, user.password).then((isValid) => {
         if (!isValid) {
           throw new InvalidError('Неверно введена почта или пароль');
@@ -49,11 +51,10 @@ const login = (req, res) => {
         const token = jwt.sign({ _id: user._id }, 'secretKey', {
           expiresIn: '7d',
         });
-        res
-          .cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-          })
+        res.cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
           .send({ token });
       });
     });
