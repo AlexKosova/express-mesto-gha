@@ -1,4 +1,6 @@
 const routes = require('express').Router();
+const Joi = require('joi');
+const { celebrate } = require('celebrate');
 const NotFoundError = require('../errors/NotFoundError');
 const userRouter = require('./users');
 const cardRouter = require('./cards');
@@ -6,7 +8,15 @@ const auth = require('../middlewares/auth');
 const { login, createUser } = require('../controllers/users');
 
 routes.post('/signin', login);
-routes.post('/signup', createUser);
+routes.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string.pattern(/^https?:\/\/(?:www\.)?[a-zA-Z0-9а-яА-Я-._~:/?#[\]@!$&'()*+,;=]+/im),
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), createUser);
 
 routes.use('/users', auth, userRouter);
 routes.use('/cards', auth, cardRouter);
