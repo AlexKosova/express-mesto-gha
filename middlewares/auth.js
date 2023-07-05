@@ -3,13 +3,13 @@ const AuthError = require('../errors/AuthError');
 const InvalidError = require('../errors/InvalidError');
 
 const auth = (req, res, next) => {
-  // const { autorization } = req.headers;
+  const { autorization } = req.headers;
 
-  // if (!autorization || !autorization.startWith('Bearer ')) {
-  //   next(new AuthError('Необходимо авторизоваться'));
-  // }
+  if (!autorization || !autorization.startWith('Bearer ')) {
+    next(new AuthError('Необходимо авторизоваться'));
+  }
 
-  const token = req.headers.autorization.replace('Bearer', '');
+  const token = autorization.replace('Bearer', '');
   let payload;
 
   try {
