@@ -3,13 +3,13 @@ const AuthError = require('../errors/AuthError');
 const InvalidError = require('../errors/InvalidError');
 
 const auth = (req, res, next) => {
-  const { autorization } = req.headers;
+  const { authorization } = req.headers;
 
-  if (!autorization || !autorization.startWith('Bearer ')) {
+  if (!authorization || !authorization.startWith('Bearer ')) {
     next(new AuthError('Необходимо авторизоваться'));
   }
 
-  const token = autorization.replace('Bearer', '');
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
@@ -22,14 +22,6 @@ const auth = (req, res, next) => {
   }
 
   req.user = payload;
-
-  // const token = req.cookies.jwt;
-  // const validToken = getToken(token);
-  // if (!validToken) {
-  //     return next(new AuthError('Необходимо авторизоваться'));
-  //   }
-  // req.user = validToken;
-  // next();
 };
 
 module.exports = auth;
