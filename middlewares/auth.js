@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const AuthError = require('../errors/AuthError');
 const InvalidError = require('../errors/InvalidError');
+const JWT_KEY = require('../controllers/users');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
@@ -13,10 +14,7 @@ const auth = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, 'secretKey');
-    if (!payload) {
-      next(new AuthError('Необходимо авторизоваться'));
-    }
+    payload = jwt.verify(token, JWT_KEY);
   } catch (err) {
     next(new InvalidError('Что-то пошло не так...'));
   }

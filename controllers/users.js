@@ -9,6 +9,8 @@ const NotFoundError = require('../errors/NotFoundError');
 const InvalidError = require('../errors/InvalidError');
 const { ERROR_INVALID } = require('../utils/constants');
 
+const JWT_KEY = 'secretKey';
+
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
@@ -33,10 +35,10 @@ const createUser = (req, res, next) => {
     )
     .then((user) => res.send(user))
     .catch((err) => {
-      if (err.code === 11000) {
+      if (err.code === 11000 || err.code === 11001) {
         next(new RegisterError('Пользователь уже существует'));
       }
-      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
+      if (err.code === ERROR_INVALID || err.name === 'ValidationError') {
         next(new InvalidError('Введены некорректные данные'));
       } else next(err);
     });
@@ -44,32 +46,37 @@ const createUser = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .select('+password')
+
+  User.findByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new AuthError('Неверно введена почта или пароль');
-      }
-      bcrypt.compare(password, user.password).then((isValid) => {
-        if (!isValid) {
-          throw new InvalidError('Неверно введена почта или пароль');
-        }
-        const token = jwt.sign({ _id: user._id }, 'secretKey', {
-          expiresIn: '7d',
-        });
-        res.cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        }).send(token);
-      })
-        .catch((err) => {
-          if (err instanceof AuthError) {
-            next(new AuthError('Некорректные почта или пароль'));
-          } else {
-            next(err);
-          }
-        });
-    });
+      const token = jwt.sign({ _id: user._id }, JWT_KEY, {
+        expiresIn: '7d',
+      });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      }).send({ token });
+    }).catch(next);
+  // User.findOne({ email })
+  //   .select('+password')
+  //   .then((user) => {
+  //     if (!user) {
+  //       next(new AuthError('Неверно введена почта или пароль'));
+  //     }
+  //     bcrypt.compare(password, user.password).then((isValid) => {
+  //       if (!isValid) {
+  //         throw new InvalidError('Неверно введена почта или пароль');
+  //       }
+  //       const token = jwt.sign({ _id: user._id }, JWT_KEY , {
+  //         expiresIn: '7d',
+  //       });
+  //       res.cookie('jwt', token, {
+  //         maxAge: 3600000 * 24 * 7,
+  //         httpOnly: true,
+  //       }).send({token});
+  //     })
+  //       .catch(next);
+  //   });
 };
 
 const getUserById = (req, res, next) => {
