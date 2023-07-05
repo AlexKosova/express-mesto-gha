@@ -30,6 +30,7 @@
     "mongoose": "^7.3.1",
     "npm-check-updates": "^16.10.12",
     "validator": "^13.9.0",
-    "validatorjs": "^3.22.1"
+    "validatorjs": "^3.22.1",
+    "verify": "^0.1.2"
   }
 }

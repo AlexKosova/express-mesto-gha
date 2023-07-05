@@ -24,8 +24,10 @@ routes.post('/signup', celebrate({
   }),
 }), createUser);
 
-routes.use('/users', auth, userRouter);
-routes.use('/cards', auth, cardRouter);
+routes.use(auth);
+
+routes.use('/users', userRouter);
+routes.use('/cards', cardRouter);
 
 routes.use(() => {
   throw new NotFoundError('Страница не найдена');
