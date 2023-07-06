@@ -6,9 +6,7 @@ const User = require('../models/user');
 const RegisterError = require('../errors/RegisterError');
 const NotFoundError = require('../errors/NotFoundError');
 const InvalidError = require('../errors/InvalidError');
-const { ERROR_INVALID } = require('../utils/constants');
-
-const JWT_KEY = 'secretKey';
+const { ERROR_INVALID, JWT_KEY } = require('../utils/constants');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -79,9 +77,7 @@ const getUser = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
     .then((user) => res.send(user))
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const updateProfile = (req, res, next) => {
