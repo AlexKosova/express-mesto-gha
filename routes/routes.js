@@ -1,6 +1,5 @@
 const routes = require('express').Router();
-const Joi = require('joi');
-const { celebrate } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const NotFoundError = require('../errors/NotFoundError');
 const userRouter = require('./users');
 const cardRouter = require('./cards');

@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const RegisterError = require('../errors/RegisterError');
-const AuthError = require('../errors/AuthError');
 const NotFoundError = require('../errors/NotFoundError');
 const InvalidError = require('../errors/InvalidError');
 const { ERROR_INVALID } = require('../utils/constants');
@@ -57,26 +56,6 @@ const login = (req, res, next) => {
         httpOnly: true,
       }).send({ token });
     }).catch(next);
-  // User.findOne({ email })
-  //   .select('+password')
-  //   .then((user) => {
-  //     if (!user) {
-  //       next(new AuthError('Неверно введена почта или пароль'));
-  //     }
-  //     bcrypt.compare(password, user.password).then((isValid) => {
-  //       if (!isValid) {
-  //         throw new InvalidError('Неверно введена почта или пароль');
-  //       }
-  //       const token = jwt.sign({ _id: user._id }, JWT_KEY , {
-  //         expiresIn: '7d',
-  //       });
-  //       res.cookie('jwt', token, {
-  //         maxAge: 3600000 * 24 * 7,
-  //         httpOnly: true,
-  //       }).send({token});
-  //     })
-  //       .catch(next);
-  //   });
 };
 
 const getUserById = (req, res, next) => {
