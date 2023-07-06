@@ -32,16 +32,24 @@ const deleteCard = (req, res, next) => {
   if (!mongoose.isValidObjectId(cardId)) {
     throw new InvalidError('Некорректный id');
   }
-  Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        next(new NotFoundError('Данные не найдены'));
-      }
-      if (_id === card.owner) {
-        res.send(card);
-      } else { next(new ForbiddenErr('У вас нет прав для удаления этой карточки')); }
-    })
-    .catch(next);
+  if (_id === req.params.owner.toString()) {
+    Card.findByIdAndRemove(cardId)
+      .then((card) => {
+        if (!card) {
+          next(new NotFoundError('Данные не найдены'));
+        } else { next(new ForbiddenErr('У вас нет прав для удаления этой карточки'));}
+      }).catch(next);
+  }
+  // Card.findByIdAndRemove(cardId)
+  //   .then((card) => {
+  //     if (!card) {
+  //       next(new NotFoundError('Данные не найдены'));
+  //     }
+  //     if (_id === card.owner.toString()) {
+  //       res.send(card);
+  //     } else { next(new ForbiddenErr('У вас нет прав для удаления этой карточки')); }
+  //   })
+  //   .catch(next);
 };
 
 const putLike = (req, res, next) => {
