@@ -16,10 +16,9 @@ module.exports = async (req, res, next) => {
 
   try {
     payload = jwt.verify(token, JWT_KEY);
-    req.user = payload;
   } catch (err) {
     next(new InvalidError('Что-то пошло не так...'));
   }
-
-  next();
+  req.user = payload;
+  return next();
 };
