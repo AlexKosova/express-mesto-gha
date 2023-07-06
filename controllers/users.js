@@ -64,19 +64,23 @@ const getUserById = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь не найден');
+        next(new NotFoundError('Пользователь не найден'));
+      } else {
+        res.send({ data: user });
       }
-      res.send({ data: user });
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
 
 const getUser = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        next(new NotFoundError('Пользователь не найден'));
+      }
+      return res.send({ data: user });
+    })
     .catch(next);
 };
 
