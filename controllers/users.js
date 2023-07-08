@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -31,13 +29,14 @@ const createUser = (req, res, next) => {
       }),
     )
     .then((user) => res.send(user))
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
-      if (err.code === 11000 || err.code === 11001) {
-        next(new RegisterError('Пользователь уже существует'));
+      if (err.code === 11000) {
+        return next(new RegisterError('Пользователь уже существует'));
       }
-      if (err.code === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError('Введены некорректные данные'));
-      } else next(err);
+      if (err.name === 'ValidationError') {
+        return next(new InvalidError('Введены некорректные данные'));
+      } next(err);
     });
 };
 
@@ -58,16 +57,13 @@ const login = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   const { userId } = req.params;
-  if (!mongoose.isValidObjectId(userId)) {
-    throw new InvalidError('Некорректный id пользователя');
-  }
   User.findById(userId)
+    // eslint-disable-next-line consistent-return
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
-      } else {
-        res.send({ data: user });
+        return next(new NotFoundError('Пользователь не найден'));
       }
+      res.send({ data: user });
     })
     .catch(next);
 };
@@ -77,7 +73,7 @@ const getUser = (req, res, next) => {
   User.findById(_id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
+        return next(new NotFoundError('Пользователь не найден'));
       }
       return res.send({ data: user });
     })
@@ -96,10 +92,9 @@ const updateProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError('Введены некорректные данные'));
-      } else {
-        next(err);
+        return next(new InvalidError('Введены некорректные данные'));
       }
+      return next(err);
     });
 };
 
@@ -110,10 +105,9 @@ const updateAvatar = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
-        next(new InvalidError('Неверная ссылка'));
-      } else {
-        next(err);
+        return next(new InvalidError('Неверная ссылка'));
       }
+      return next(err);
     });
 };
 
