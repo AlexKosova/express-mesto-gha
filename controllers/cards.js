@@ -36,7 +36,7 @@ const deleteCard = (req, res, next) => {
       }
       if (_id === card.owner.toString()) {
         card.deleteOne()
-          .then(() => res.send('Успешно удалено'));
+          .then(() => res.send(card));
       } else { return next(new ForbiddenErr('У вас нет прав для удаления этой карточки')); }
     })
     .catch(next);
