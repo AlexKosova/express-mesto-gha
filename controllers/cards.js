@@ -29,15 +29,14 @@ const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
   const { _id } = req.user;
   Card.findById(cardId)
-    // eslint-disable-next-line consistent-return
     .then((card) => {
       if (!card) {
         return next(new NotFoundError('Данные не найдены'));
       }
       if (_id === card.owner.toString()) {
-        card.deleteOne()
+        return card.deleteOne()
           .then(() => res.send(card));
-      } else { return next(new ForbiddenErr('У вас нет прав для удаления этой карточки')); }
+      } return next(new ForbiddenErr('У вас нет прав для удаления этой карточки'));
     })
     .catch(next);
 };

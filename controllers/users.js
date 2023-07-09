@@ -4,7 +4,7 @@ const User = require('../models/user');
 const RegisterError = require('../errors/RegisterError');
 const NotFoundError = require('../errors/NotFoundError');
 const InvalidError = require('../errors/InvalidError');
-const { ERROR_INVALID, JWT_KEY } = require('../utils/constants');
+const { JWT_KEY } = require('../utils/constants');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -91,7 +91,7 @@ const updateProfile = (req, res, next) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         return next(new InvalidError('Введены некорректные данные'));
       }
       return next(err);
@@ -104,7 +104,7 @@ const updateAvatar = (req, res, next) => {
   User.findByIdAndUpdate(_id, data, { runValidators: true, new: true })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === ERROR_INVALID || err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         return next(new InvalidError('Неверная ссылка'));
       }
       return next(err);
